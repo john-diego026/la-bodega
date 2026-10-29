@@ -1,0 +1,339 @@
+{
+  "info": {
+    "name": "LA BODEGA - API REST Collection",
+    "_postman_id": "b3e94fa1-c112-4f79-8800-labodega001",
+    "description": "Colección completa para pruebas de endpoints de la discoteca LA BODEGA con FastAPI y Supabase.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Autenticación",
+      "item": [
+        {
+          "name": "Login (Obtener JWT Bearer Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set('token', jsonData.access_token);",
+                  "    console.log('Token guardado en colección:', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"bartender@labodega.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Usuario / Bartender",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"bartender@labodega.com\",\n  \"password\": \"123456\",\n  \"full_name\": \"Staff Barra Principal\",\n  \"role\": \"bartender\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Perfil Actual (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Clientes",
+      "item": [
+        {
+          "name": "Listar Clientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": ["{{base_url}}"],
+              "path": ["clientes"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Cliente (+18)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_c\": \"Carolina Silva\",\n  \"telefono\": \"+591 78912345\",\n  \"direccion\": \"Av. Las Palmas #78\",\n  \"edad\": 24\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": ["{{base_url}}"],
+              "path": ["clientes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Bebidas y Storage",
+      "item": [
+        {
+          "name": "Listar Bebidas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bebidas",
+              "host": ["{{base_url}}"],
+              "path": ["bebidas"]
+            }
+          }
+        },
+        {
+          "name": "Filtrar Bebidas por Tipo (Ron)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bebidas?tipo=Ron",
+              "host": ["{{base_url}}"],
+              "path": ["bebidas"],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "Ron"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Subir Imagen a Supabase Storage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/bebidas/upload-image",
+              "host": ["{{base_url}}"],
+              "path": ["bebidas", "upload-image"]
+            }
+          }
+        },
+        {
+          "name": "Crear Bebida con Imagen de Supabase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_b\": \"Gin Bombay Sapphire\",\n  \"tipo\": \"Gin\",\n  \"cantidad\": 12,\n  \"precio\": 50.00,\n  \"imagen_url\": \"https://your-supabase.supabase.co/storage/v1/object/public/bebidas-images/catalogo/gin.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/bebidas",
+              "host": ["{{base_url}}"],
+              "path": ["bebidas"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Gaseosas",
+      "item": [
+        {
+          "name": "Listar Gaseosas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/gaseosas",
+              "host": ["{{base_url}}"],
+              "path": ["gaseosas"]
+            }
+          }
+        },
+        {
+          "name": "Crear Gaseosa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_g\": \"Ginger Ale Canada Dry 350ml\",\n  \"cantidad\": 30\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/gaseosas",
+              "host": ["{{base_url}}"],
+              "path": ["gaseosas"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Stock y Alertas Automáticas",
+      "item": [
+        {
+          "name": "Consultar Todo el Stock",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/stock",
+              "host": ["{{base_url}}"],
+              "path": ["stock"]
+            }
+          }
+        },
+        {
+          "name": "Consultar Solo Alertas de Stock Faltante",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/stock/alertas",
+              "host": ["{{base_url}}"],
+              "path": ["stock", "alertas"]
+            }
+          }
+        },
+        {
+          "name": "Resumen Ejecutivo de Inventario",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/stock/resumen-general",
+              "host": ["{{base_url}}"],
+              "path": ["stock", "resumen-general"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Lote de Stock (Dispara Alerta si cantidad <= umbral)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cerveza\": \"Cerveza Stella Artois 330ml\",\n  \"cantidad\": 4,\n  \"umbral_minimo\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/stock",
+              "host": ["{{base_url}}"],
+              "path": ["stock"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

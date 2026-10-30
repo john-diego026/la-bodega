@@ -21,15 +21,16 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Configuración de CORS para Next.js y clientes externos
-if settings.BACKEND_CORS_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+# Configuración de CORS integrada
+cors_origins = getattr(settings, "cors_origin_list", getattr(settings, "BACKEND_CORS_ORIGINS", []))
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[str(origin) for origin in cors_origins] if cors_origins else ["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Registrar rutas de la API v1
 app.include_router(api_router, prefix=settings.API_V1_STR)
